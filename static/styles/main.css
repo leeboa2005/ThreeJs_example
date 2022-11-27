@@ -1,0 +1,13 @@
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+body { 
+  font-family: monospace;
+  margin: 0; 
+  padding:0;
+  font-size: 1.2rem;
+  font-weight: normal;
+}
+
+canvas { 
+  display: block; 
+}

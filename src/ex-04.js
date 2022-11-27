@@ -1,0 +1,113 @@
+import * as THREE from 'three'
+import { PointLight, TorusKnotGeometry } from 'three';
+import { WEBGL } from './webgl'
+
+if (WEBGL.isWebGLAvailable()) {
+  //장면
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xeeeeee);
+
+  //카메라
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.z = 2;
+
+
+  //랜더러
+  const renderer = new THREE.WebGLRenderer({
+     alpha :true,
+     antialias :true
+    });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  document.body.appendChild(renderer.domElement);
+
+  //빛 
+  const PointLight = new THREE.PointLight(0xffffff, 1);
+  PointLight.position.set(0,2,6);
+  scene.add(PointLight);
+
+
+  //텍스터 추가 
+  const textureLoder = new THREE.TextureLoader();
+  const textureBaseColor = textureLoder.load('../static/img/Leather_Padded_001_basecolor.jpg');
+  const textureNormalMap = textureLoder.load('../static/img/Leather_Padded_001_normal.jpg');
+  const textureHeightMap = textureLoder.load('../static/img/Leather_Padded_001_height.png');
+  const textureRoughnessMap = textureLoder.load('../static/img/Leather_Padded_001_roughness.jpg');
+
+  //도형 추가 
+  const geometry = new THREE.SphereGeometry(0.3, 32, 16);
+  // const geometry = new THREE.PlaneGeometry(1,1);
+  const material01 = new THREE.MeshStandardMaterial({
+    map : textureBaseColor
+  });
+
+  const obj01 = new THREE.Mesh(geometry, material01);
+  obj01.position.x =  -1.5;
+  scene.add(obj01);
+
+  //02
+  const material02 = new THREE.MeshStandardMaterial({
+    map : textureBaseColor,
+    normalMap : textureNormalMap
+  });
+
+  const obj02 = new THREE.Mesh(geometry, material02);
+  obj02.position.x = -0.5;
+  scene.add(obj02);
+
+  // 03
+  const material03 = new THREE.MeshPhysicalMaterial({
+    map : textureBaseColor,
+    normalMap : textureNormalMap,
+    displacementMap : textureHeightMap,
+    displacementScale : 0.03
+    // 밝고 어두운것에 따라서 도형의 높낮이가 변형 될 수 있다.
+  });
+
+
+  const obj03 = new THREE.Mesh(geometry, material03);
+  obj03.position.x = 0.5;
+  scene.add(obj03);
+
+    // 04
+    const material04 = new THREE.MeshLambertMaterial({
+      map : textureBaseColor,
+      normalMap : textureNormalMap,
+      displacementMap : textureHeightMap,
+      displacementScale : 0.03,
+      textureRoughnessMap : textureRoughnessMap,
+      roughness : 0.9
+    });
+  
+    const obj04 = new THREE.Mesh(geometry, material04);
+    obj04.position.x = 1.5;
+    scene.add(obj04);
+
+  function render(time) {
+    time *= 0.0005;  // convert time to seconds
+
+    obj01.rotation.y = time;
+    obj02.rotation.y = time;
+    obj03.rotation.y = time;
+    obj04.rotation.y = time;
+
+    renderer.render(scene, camera);
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  //반응형 처리
+
+  function onWindowResize(){
+    camera.aspect = window.innerWidth /window.innerHeight // 종횡비 조절떄문에 꼭 필요함
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  }
+
+  window.addEventListener('resize', onWindowResize);
+
+} else {
+  var warning = WEBGL.getWebGLErrorMessage()
+  document.body.appendChild(warning)
+}
